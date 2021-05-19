@@ -1,0 +1,6 @@
+framework module Pods_CameraFilterRxSwift {
+  umbrella header "Pods-CameraFilterRxSwift-umbrella.h"
+
+  export *
+  module * { export * }
+}
