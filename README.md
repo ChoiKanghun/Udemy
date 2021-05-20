@@ -142,3 +142,117 @@ selectedPhot의 onNext로 어떤 데이터가 들어오면 해당 데이터(이�
 그리고 secondViewController에서 앨범의 사진을 클릭했을 때, 그러니까 정확히는 `didSelectItemAt` 함수가 호출될 때
 
 `self?.selectedPhotoSubject.onNext(image)` 를 통해 onNext 메서드를 호출하여 firstViewController에서 선택한 이미지를 받아오도록 하였습니다.
+
+
+
+<br>
+
+
+
+### 2) FilterService가 이미지를 받아오는 데에 사용
+
+원래는 filter기능을 구현한 함수를 FilterService.swift 라는 파일 안에 넣고, 다른 곳에서 호출하여 쓸 수 있게 했었습니다.
+
+그 함수란 아래와 같은 것이었는데요.
+
+```swift
+		func applyFilter(to inputImage: UIImage, completion: @escaping ((UIImage) -> ())) {
+        let filter = CIFilter(name: "CICMYKHalftone")!
+        filter.setValue(5.0, forKey: kCIInputWidthKey)
+        
+        if let sourceImage = CIImage(image: inputImage) {
+            filter.setValue(sourceImage, forKey: kCIInputImageKey)
+            if let cgImage = self.context.createCGImage(
+                filter.outputImage!,
+                from: filter.outputImage!.extent) {
+                
+                let processdImage
+                    = UIImage(cgImage: cgImage,
+                              scale: inputImage.scale,
+                              orientation: inputImage.imageOrientation)
+                completion(processdImage)
+            }
+        }
+    }
+```
+
+위 코드는 어떤 `UIImage`를 받아서 이미지 필터 과정을 거친 후 필터링 된 이미지를 반환합니다.
+
+
+
+<br>
+
+
+
+이것을 RxSwift를 이용하여 `observable<UIImage>`를 만드는 것과 동시에 inputImage를 받고 해당 이미지를 filter시켜서 onNext() 메서드를 호출하도록 하였습니다. 그리고 그것을 firstViewController에서 filter버튼을 누를 때마다 구독하면 매번 filter된 이미지를 받아올 수 있습니다.
+
+코드는 다음과 같았습니다:
+
+
+
+<br>
+
+
+
+FilterService.swift
+
+```swift
+		func applyFilter(to inputImage: UIImage) -> Observable<UIImage> {
+        return Observable<UIImage>.create { (observer) in
+            self.applyFilter(to: inputImage) { filteredImage in
+                observer.onNext(filteredImage)
+            }
+            return Disposables.create()
+        }
+    }
+
+	  private func applyFilter(to inputImage: UIImage, completion: @escaping ((UIImage) -> ())) {
+        let filter = CIFilter(name: "CICMYKHalftone")!
+        filter.setValue(5.0, forKey: kCIInputWidthKey)
+        
+        if let sourceImage = CIImage(image: inputImage) {
+            filter.setValue(sourceImage, forKey: kCIInputImageKey)
+            if let cgImage = self.context.createCGImage(
+                filter.outputImage!,
+                from: filter.outputImage!.extent) {
+                
+                let processdImage
+                    = UIImage(cgImage: cgImage,
+                              scale: inputImage.scale,
+                              orientation: inputImage.imageOrientation)
+                completion(processdImage)
+            }
+        }
+    }
+```
+
+
+
+<br>
+
+
+
+viewController
+
+```swift
+    @IBAction func touchUpApplyFilterButton(_ sender: Any) {
+        guard let sourceImage = self.photoImageView.image
+        else {
+            print ("can't get source Image")
+            return
+        }
+      
+				// applyFilter -> filteredImage        
+        FilterService().applyFilter(to: sourceImage) 
+            .subscribe(onNext: { (filteredImage) in
+                DispatchQueue.main.async {
+                    self.photoImageView.image = filteredImage
+                }
+            }).disposed(by: disposeBag)   
+    }
+```
+
+
+
+<br>
+
