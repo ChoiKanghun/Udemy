@@ -18,26 +18,29 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xHp-zb-tlF">
-                                <rect key="frame" x="0.0" y="88" width="414" height="672"/>
+                                <rect key="frame" x="0.0" y="88" width="414" height="715"/>
                             </imageView>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pnB-zq-JZG">
-                                <rect key="frame" x="152" y="780" width="110" height="45"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="110" id="0va-y9-P3e"/>
-                                    <constraint firstAttribute="height" constant="45" id="g5t-NX-DtX"/>
-                                </constraints>
+                                <rect key="frame" x="10" y="813" width="394" height="39"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Apply Filter"/>
+                                <connections>
+                                    <action selector="touchUpApplyFilterButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VCh-gh-0OK"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="pnB-zq-JZG" secondAttribute="trailing" constant="10" id="4zO-3m-vaP"/>
                             <constraint firstItem="pnB-zq-JZG" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="9Zc-xG-GuA"/>
-                            <constraint firstItem="pnB-zq-JZG" firstAttribute="top" secondItem="xHp-zb-tlF" secondAttribute="bottom" constant="20" id="B3R-FT-ijF"/>
-                            <constraint firstItem="xHp-zb-tlF" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="EYM-JR-mBh"/>
-                            <constraint firstItem="xHp-zb-tlF" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.75" id="dJ7-z6-gOx"/>
+                            <constraint firstItem="xHp-zb-tlF" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="FHy-dF-1Jy"/>
+                            <constraint firstItem="pnB-zq-JZG" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="JIv-bd-tfm"/>
+                            <constraint firstItem="xHp-zb-tlF" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="OXz-dc-QSi"/>
                             <constraint firstItem="xHp-zb-tlF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="g64-sF-c50"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="pnB-zq-JZG" secondAttribute="bottom" constant="10" id="ki1-v4-pco"/>
+                            <constraint firstItem="pnB-zq-JZG" firstAttribute="top" secondItem="xHp-zb-tlF" secondAttribute="bottom" constant="10" id="ntF-4v-z1U"/>
+                            <constraint firstItem="xHp-zb-tlF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="oyI-cN-O0X"/>
                             <constraint firstItem="xHp-zb-tlF" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="vbB-0m-osz"/>
                         </constraints>
                     </view>
@@ -48,6 +51,10 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="applyFilterButton" destination="pnB-zq-JZG" id="eCu-YO-P0s"/>
+                        <outlet property="photoImageView" destination="xHp-zb-tlF" id="Njm-PK-E3c"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
@@ -62,19 +69,33 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="JhP-jr-bWO">
-                            <size key="itemSize" width="128" height="128"/>
+                            <size key="itemSize" width="100" height="100"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <inset key="sectionInset" minX="10" minY="10" maxX="10" maxY="10"/>
                         </collectionViewFlowLayout>
                         <cells>
-                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="m1j-J8-QNX">
-                                <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCollectionViewCell" id="m1j-J8-QNX" customClass="PhotoCollectionViewCell" customModule="CameraFilterRxSwift" customModuleProvider="target">
+                                <rect key="frame" x="10" y="10" width="100" height="100"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Um3-Xe-i64">
-                                    <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ne7-3M-ArC">
+                                            <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                                        </imageView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="ne7-3M-ArC" firstAttribute="top" secondItem="Um3-Xe-i64" secondAttribute="top" id="gr3-fL-8HG"/>
+                                        <constraint firstAttribute="bottom" secondItem="ne7-3M-ArC" secondAttribute="bottom" id="iCs-P1-iaS"/>
+                                        <constraint firstAttribute="trailing" secondItem="ne7-3M-ArC" secondAttribute="trailing" id="ocP-ph-6wp"/>
+                                        <constraint firstItem="ne7-3M-ArC" firstAttribute="leading" secondItem="Um3-Xe-i64" secondAttribute="leading" id="tpJ-zA-YGA"/>
+                                    </constraints>
                                 </collectionViewCellContentView>
+                                <connections>
+                                    <outlet property="imageView" destination="ne7-3M-ArC" id="u3e-Tu-7WL"/>
+                                </connections>
                             </collectionViewCell>
                         </cells>
                         <connections>
