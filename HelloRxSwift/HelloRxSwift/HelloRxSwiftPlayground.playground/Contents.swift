@@ -1,8 +1,87 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import PlaygroundSupport
+
+// filtering operators
+let strikes = PublishSubject<String>()
 
 let disposeBag = DisposeBag()
+
+strikes
+    .ignoreElements()
+    .subscribe { _ in
+        print("[Subscription is called]")
+    }.disposed(by: disposeBag)
+
+strikes.onNext("A")
+strikes.onNext("B")
+strikes.onNext("C")
+
+
+
+
+
+// subjects
+
+/*
+ PublishSubject는 subscribe할 수 있고,
+ event를 전달해주는 대표적인 subject이다.
+    
+ */
+let subject = PublishSubject<String>()
+
+subject.onNext("Issue #1") // 첫 번째 이슈가 발행됐다고 가정.
+subject.subscribe { (event) in
+    print(event)
+}
+// 아무것도 출력되지 않음.
+subject.onNext("Issue #2") // 두 번째 이슈가 발행됐다고 가정.
+// next(Issue #2)가 출력됨.
+subject.onNext("Issue #3")
+// next(Issue #3) dispose()
+
+subject.dispose()
+subject.onCompleted()
+//아무것도 출력되지 않음.
+
+// initialValue를 요구.
+let behaviorSubject = BehaviorSubject(value: "Issue #1")
+behaviorSubject.subscribe { event in
+    print(event)
+}
+behaviorSubject.onNext("Issue #2")
+// 1, 2가 모두 출력됨.
+// next(Issue #1)
+// next(Issue #2)
+
+// 버퍼 사이즈를 지정해줘야 하는 subject.
+// `subscribe 시점에` 버퍼 사이즈 만큼 최신에 발행된 onNext event를 가져옴.
+let replaySubject = ReplaySubject<String>.create(bufferSize: 2)
+replaySubject.onNext("Issue #1")
+replaySubject.onNext("Issue #2")
+replaySubject.onNext("Issue #3")
+
+replaySubject.subscribe { event in
+    print(event)
+}
+// 출력:
+// next(Issue #2)
+// next(Issue #3)
+
+replaySubject.onNext("Issue #4")
+replaySubject.onNext("Issue #5")
+replaySubject.onNext("Issue #6")
+
+print("[ReplaySubscription 2]")
+replaySubject.subscribe { event in
+    print(event)
+}
+// 출력:
+// next(Issue #5)
+// next(Issue #6)
+
+
 
 // relay는 어떤 변수를 생성하고 그것을 Observable하게 만들 때 쓰인다.
 // 초기값을 지정해주어야 한다.
