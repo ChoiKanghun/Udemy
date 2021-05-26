@@ -1,0 +1,6 @@
+framework module Pods_MockTrello {
+  umbrella header "Pods-MockTrello-umbrella.h"
+
+  export *
+  module * { export * }
+}

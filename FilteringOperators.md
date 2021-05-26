@@ -16,7 +16,7 @@
 
 아래와 같은 사진처럼 모든 element가 무시된다. 그러고 나서는 onCompleted() 메서드가 호출된다.
 
-![image-20210521193944487](/Users/choeganghun/Library/Application Support/typora-user-images/image-20210521193944487.png)
+#### ![image-20210521193944487](/Users/choeganghun/Library/Application Support/typora-user-images/image-20210521193944487.png)
 
 
 
