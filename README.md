@@ -1,20 +1,14 @@
 # Udemy - RxSwift
 
-해당 Repository는 `RxSwift`를 배우고 관련된 프로젝트를 남긴 공간입니다.
+해당 Repository는 `RxSwift` 및 `RxCocoa`를 배우고 관련된 프로젝트를 남긴 공간입니다.
 
-작업환경은 xcode 12.5, swift5 를 사용했습니다.
+작업환경은 xcode 12.5, 언어는 swift5 입니다.
 
-
+공부한 기록을 `Learning RxSwift` 폴더에 남겨두었습니다.
 
 
 
 <br>
-
-
-
-
-
-
 
 <br>
 
@@ -255,4 +249,42 @@ viewController
 
 
 <br>
+
+
+
+# Project 2 - MockTrello
+
+
+
+두 번째 프로젝트인 MockTrello는 아래 사진과 같이 작업을 등록하고, 작업의 우선순위에 따라 필터링하여 화면에 나타내주는 프로젝트입니다.
+
+
+
+<br>
+
+
+
+![MockTrello](https://user-images.githubusercontent.com/41955126/119765081-771f5200-beed-11eb-9ee6-fa172a9888f9.gif)
+
+
+
+<br>
+
+
+
+## RxSwift, RxCocoa를 이용하여 필터링
+
+MockTrello 프로젝트에서는 `Title, Priority` 라는 멤버를 가지는 구조체 Task를 사용자가 입력하고, 
+
+입력한 정보를 우선 순위(Priority)에 따라 필터링하여 보여줍니다.
+
+이 과정에서 발행한 Task를 subscribe과 dispose하는 부분은 RxSwift 를 이용했고, subscribe하여 들어오는 값에 대해 저장하는 부분은 RxCocoa의 BehaviorRelay를 이용하였습니다. 
+
+
+
+<br>
+
+
+
+자세한 코드는 [여기 Repository](https://github.com/ChoiKanghun/Udemy/tree/main/MockTrello/MockTrello)를 확인해주세요 !
 

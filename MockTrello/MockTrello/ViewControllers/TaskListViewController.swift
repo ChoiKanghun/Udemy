@@ -47,7 +47,8 @@ class TaskListViewController: UIViewController {
                 print(task)
                 
                 let priority
-                    = Priority(rawValue: self.prioritySegmentedControl.selectedSegmentIndex - 1)
+                    = Priority(rawValue:
+                        self.prioritySegmentedControl.selectedSegmentIndex - 1)
                 
                 var existingTasks = self.tasks.value
                 existingTasks.append(task)
