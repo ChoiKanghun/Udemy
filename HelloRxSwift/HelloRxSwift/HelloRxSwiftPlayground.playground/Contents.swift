@@ -3,6 +3,89 @@ import RxSwift
 import RxCocoa
 import PlaygroundSupport
 
+//operator transforming - flatMapLatest
+let disposeBag = DisposeBag()
+
+struct Student {
+    var score: BehaviorRelay<Int>
+}
+
+let son = Student(score: BehaviorRelay(value: 75))
+let park = Student(score: BehaviorRelay(value: 90))
+
+let student = PublishSubject<Student>()
+
+student.asObservable()
+    .flatMapLatest { $0.score.asObservable() }
+    .subscribe(onNext: {
+        print($0)
+    }).disposed(by: disposeBag)
+ 
+print("----son----")
+student.onNext(son)
+son.score.accept(100)
+
+
+print("----park----")
+student.onNext(park)
+park.score.accept(70)
+
+
+print("----son again----")
+son.score.accept(42)
+
+
+////operator transforming - flatMap
+//let disposeBag = DisposeBag()
+//
+//struct Student {
+//    var score: BehaviorRelay<Int>
+//}
+//
+//let son = Student(score: BehaviorRelay(value: 75))
+//let park = Student(score: BehaviorRelay(value: 90))
+//
+//let student = PublishSubject<Student>()
+//
+//student.asObservable()
+//    .flatMap { $0.score.asObservable() }
+//    .subscribe(onNext: {
+//        print($0)
+//    }).disposed(by: disposeBag)
+//
+
+//print("----son----")
+//student.onNext(son)
+//son.score.accept(100)
+//
+//
+//print("----park----")
+//student.onNext(park)
+//park.score.accept(70)
+//
+//
+//print("----son again----")
+//son.score.accept(42)
+//// operator transforming - map
+//let disposeBag = DisposeBag()
+//
+//Observable.of(1,2,3,4,5)
+//    .map {
+//        return $0 * 2
+//    }.subscribe(onNext: {
+//        print($0)
+//    }).disposed(by: disposeBag)
+
+//// operator Transforming - toArray
+//let disposeBag = DisposeBag()
+//
+//Observable.of(1,2,3,4,5)
+//    .toArray()
+//    .subscribe(onNext: {
+//        print($0)
+//    }).disposed(by: disposeBag)
+//
+
 //// filtering operators - takeWhile
 //
 //let disposeBag = DisposeBag()
