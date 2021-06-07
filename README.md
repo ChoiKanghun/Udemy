@@ -288,3 +288,199 @@ MockTrello 프로젝트에서는 `Title, Priority` 라는 멤버를 가지는 �
 
 자세한 코드는 [여기 Repository](https://github.com/ChoiKanghun/Udemy/tree/main/MockTrello/MockTrello)를 확인해주세요 !
 
+
+
+<br>
+
+
+
+# Project 3 - NewsAPI
+
+newsAPI 는 `newsapi.org`에서 제공하는 API를 이용해 테이블뷰로 받아온 데이터를 나타내는 앱입니다.
+
+데이터를 뿌리는 과정에서 RxSwift와 RxCocoa를 이용했습니다.
+
+
+
+<br>
+
+
+
+<img src="https://user-images.githubusercontent.com/41955126/120973778-54712100-c7aa-11eb-8248-3993621cbc16.gif">
+
+
+
+
+
+<br>
+
+
+
+## Rx를 쓰기 전의 사전 준비
+
+
+
+먼저 newsapi를 요청하면 다음과 같은 데이터가 들어옵니다.
+
+들어온 데이터 중에서 `articles` 배열의 `title, description` 만 가지고 테이블뷰에 나타냅니다.
+
+
+
+<br>
+
+
+
+```swift
+{
+"status": "ok",
+"totalResults": 38,
+"articles": [
+		{
+		"source": {
+				"id": null,
+				"name": "CNET"
+		},
+		"author": "Mark Serrels",
+		"title": "Logan Paul vs. Floyd Mayweather Jr. results: An anticlimactic affair with no winners - CNET",
+		"description": "The fight is over and it was... not good.",
+		"url": "https://www.cnet.com/news/logan-paul-vs-floyd-mayweather-jr-results-an-anticlimactic-affair-with-no-winners/",
+		"urlToImage": "https://www.cnet.com/a/img/KJYrS6sSWpki1VhBRiSIpDNDI7w=/1200x630/2021/06/04/aec14e3b-21b7-48b2-bd07-8d761cda0bbe/gettyimages-1232731155.jpg",
+		"publishedAt": "2021-06-07T04:04:00Z",
+		"content": "Well, that sucked.\r\nCliff Hawkins/Getty Images\r\nThe Floyd Mayweather vs. Logan Paul fight is over. Given it was an exhibition, no winner was declared, but Floyd mostly did what he wanted, with an inc… [+9261 chars]"
+		},
+		{
+		"source": {
+				"id": "reuters",
+				"name": "Reuters"
+		},
+		"author": "Renju Jose",
+		"title": "Australia's Victoria logs biggest rise in COVID-19 cases in a week - Reuters",
+		"description": "Australia's Victoria state on Monday reported its biggest rise in new locally acquired COVID-19 cases in nearly a week as authorities scramble to track the source of the highly infectious Delta variant found among infections.",
+		"url": "https://www.reuters.com/world/asia-pacific/australias-victoria-reports-biggest-rise-covid-19-cases-week-2021-06-06/",
+		"urlToImage": "https://www.reuters.com/resizer/7_54IbgIWtEy2-pWN3VgtXf8SY4=/1200x628/smart/filters:quality(80)/cloudfront-us-east-2.images.arcpublishing.com/reuters/WT5NSAFU7ZN7DNDBVAXIN2A4AY.jpg",
+		"publishedAt": "2021-06-07T03:25:00Z",
+		"content": "An empty Queen Victoria Market is seen on the first day of a seven-day lockdown as the state of Victoria looks to curb the spread of a coronavirus disease (COVID-19) outbreak in Melbourne, Australia,… [+2367 chars]"
+		},
+		{
+		  ...
+```
+
+
+
+<br>
+
+
+
+이러한 상황에서 model은 다음과 같이 설계했습니다.
+
+하나의 Article은 title과 description을 가지고,
+
+ArticleList는 article 여러 개를 가지는 배열입니다.
+
+그리고 articlesList는 Decodable한 모든 자료형을 받을 수 있는 Resource 타입의 all을 가집니다.
+
+이 all은 url을 가지고 있습니다. url은 newsapi를 GET할 메서드입니다.
+
+
+
+<br>
+
+
+
+```swift
+import Foundation
+/* 참고
+struct Resource<T: Decodable> {
+    let url: URL
+}
+*/
+struct ArticlesList: Decodable {
+    let articles: [Article]?
+    
+}
+
+extension ArticlesList {
+    static var all: Resource<ArticlesList> = {
+        let url = URL(string: "https://newsapi.org/v2/top-headlines?country=us&apiKey=e9b514c39c5f456db8ed4ecb693b0040")!
+        return Resource(url: url)
+    }()
+}
+
+struct Article: Decodable {
+    let title: String?
+    let description: String?
+}
+```
+
+
+
+<br>
+
+
+
+## RxSwift, RxCocoa를 적용한 부분.
+
+
+
+먼저 URLRequest를 약간 수정해서 사용했습니다.
+
+URLRequest 시 load를 호출하면 
+
+어떤 url을 갖고 있는 resuorce에 대해 
+
+URLRequest를 요청하고, 
+
+`URLSession.shared.rx.data`로 데이터를 받아오면
+
+.map을 통해 data를 decode하여 반환하고,
+
+그 반환값을 다시 Observable하게 리턴합니다.
+
+```swift
+extension URLRequest {
+    
+    static func load<T>(resource: Resource<T>) -> Observable<T?> {
+        return Observable.from([resource.url])
+            .flatMap { url -> Observable<Data> in
+                let request = URLRequest(url: url)
+                return URLSession.shared.rx.data(request: request)
+            }.map { data -> T? in
+                return try? JSONDecoder().decode(T.self, from: data)
+            }.asObservable()
+    }
+    
+}
+```
+
+
+
+<br>
+
+
+
+그리고 위 URLResquest의 load를 가지고
+
+테이블뷰 데이터를 뿌려주는 곳에서는 load의 결과를 subscribe하고
+
+result에 담긴 articles 정보를 가져와서 테이블뷰에 나타냅니다.
+
+
+
+<br>
+
+
+
+```swift
+ URLRequest.load(resource: ArticlesList.all)
+            .subscribe(onNext:  { [weak self] result in
+                if let result = result,
+                   let articles = result.articles {
+                    self?.articles = articles
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                }
+            }).disposed(by: disposeBag)
+        
+```
+
