@@ -422,6 +422,8 @@ struct Article: Decodable {
 
 
 
+### flatMap, map, Observable, rxControl
+
 먼저 URLRequest를 약간 수정해서 사용했습니다.
 
 URLRequest 시 load를 호출하면 
@@ -470,6 +472,8 @@ result에 담긴 articles 정보를 가져와서 테이블뷰에 나타냅니다
 
 
 
+### dispose
+
 ```swift
  URLRequest.load(resource: ArticlesList.all)
             .subscribe(onNext:  { [weak self] result in
@@ -483,4 +487,204 @@ result에 담긴 articles 정보를 가져와서 테이블뷰에 나타냅니다
             }).disposed(by: disposeBag)
         
 ```
+
+
+
+<br>
+
+
+
+# WeatherApp
+
+어떤 도시의 이름을 입력 받아 해당 도시의 기온 및 습도를 가져오는 앱입니다.
+
+
+
+<br>
+
+
+
+<img src="https://user-images.githubusercontent.com/41955126/121124684-48479b00-c860-11eb-8b54-60754c930996.gif">
+
+
+
+<br>
+
+
+
+## 전제 조건
+
+먼저 `api.openweathermap.org` 에 가입하셔서 apikey를 가져오셔야 합니다.
+
+다음 url을 통해 받아올 수 있으며,
+
+```
+http://api.openweathermap.org/data/2.5/weather?q=seoul&appid={YourAPIKey}&units=metric
+```
+
+아래와 같은 결과를 가져옵니다.
+
+
+
+<br>
+
+
+
+```json
+{
+  ...
+	main: {
+		temp: 12.42,
+		pressure: 1123,
+		humidity: 100,
+		temp_min: 12.00,
+		temp_max: 23.23
+	},
+  ...
+}
+```
+
+
+
+<br>
+
+
+
+이에 맞게 다음과 같이 Model을 작성했습니다:
+
+```swift
+struct WeatherResult: Codable {
+    let main: Weather
+}
+
+struct Weather: Codable {
+    let temp: Double
+    let humidity: Double
+}
+
+extension WeatherResult {
+    static var empty: WeatherResult {
+        return WeatherResult(main: Weather(temp: 0.0, humidity: 0.0))
+    }
+}
+```
+
+
+
+<br>
+
+
+
+## RxSwift 및 RxCocoa를 사용한 부분
+
+
+
+
+
+먼저 API 데이터를 가져오기 위해 URLSession을 사용할 때 Rx의 개념을 사용했습니다.
+
+flatMap을 이용해 URLSession이 받아오는 data를 Observable하게 받아오고,
+
+해당 data를 다시 map으로 decode하여 원하는 값을 T에 넣어 observable로 반환하도록 하였습니다.
+
+
+
+### flatmap, map, asObservable, rxControl
+
+
+
+```swift
+struct Resource<T> {
+    let url: URL
+}
+
+extension URLRequest {
+    
+    static func load<T: Decodable>(resource: Resource<T>) -> Observable<T> {
+        return Observable.from([resource.url])
+            .flatMap { url -> Observable<Data> in
+                let request = URLRequest(url: url)
+                return URLSession.shared.rx.data(request: request)
+            }.map { data -> T in
+                return try JSONDecoder().decode(T.self, from: data)
+            }.asObservable()
+    }
+    
+}
+```
+
+
+
+<br>
+
+
+
+### driver(bind), observeOn
+
+
+
+위의 load는 아래처럼 resource에 url을 넣어 사용했으며,
+
+load의 결과는 `Driver`를 사용할 수 있게끔 `asDriver`를 사용하여 search에 넣어주었습니다.
+
+
+
+```swift
+        let resource = Resource<WeatherResult>(url: url)
+        
+        let search = URLRequest.load(resource: resource)
+            .observeOn(MainScheduler.instance)
+            .asDriver(onErrorJustReturn: WeatherResult.empty)
+        
+```
+
+
+
+
+
+<br>
+
+
+
+그리고 아래처럼 `drive`를 사용해 search에 담긴 main 정보를 알맞은 label에 담아주었습니다.
+
+
+
+```swift
+// drive
+        search.map { "\($0.main.temp) ℃" }
+            .drive(self.temperatureLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        search.map { "\($0.main.humidity) 💦"}
+            .drive(self.humidityLabel.rx.text)
+            .disposed(by: disposeBag)
+```
+
+
+
+<br>
+
+
+
+### rxControlEvent
+
+그리고 cityNameTextField의 text의 편집이 끝났을 때 특정 메서드가 동작하도록 하기 위해 `rx.controlEvent`를 사용하였습니다.
+
+```swift
+self.cityNameTextField.rx.controlEvent(.editingDidEndOnExit)
+            .asObservable()
+            .map { self.cityNameTextField.text }
+            .subscribe(onNext: { city in
+                if let city = city {
+                    if city.isEmpty {
+                        self.displayWeather(nil)
+                    } else {
+                        self.fetchWeather(by: city)
+                    }
+                }
+            }).disposed(by: disposeBag)
+```
+
+
 
