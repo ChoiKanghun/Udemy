@@ -3,36 +3,141 @@ import RxSwift
 import RxCocoa
 import PlaygroundSupport
 
-//operator transforming - flatMapLatest
 let disposeBag = DisposeBag()
 
-struct Student {
-    var score: BehaviorRelay<Int>
-}
+let source = Observable.of(1,2,3,4,5,6)
 
-let son = Student(score: BehaviorRelay(value: 75))
-let park = Student(score: BehaviorRelay(value: 90))
-
-let student = PublishSubject<Student>()
-
-student.asObservable()
-    .flatMapLatest { $0.score.asObservable() }
+source.scan(0, accumulator: +)
     .subscribe(onNext: {
-        print($0)
+      print($0)
     }).disposed(by: disposeBag)
- 
-print("----son----")
-student.onNext(son)
-son.score.accept(100)
 
+/* 출력
+ 1
+ 3
+ 6
+ 10
+ 15
+ 21
+ */
 
-print("----park----")
-student.onNext(park)
-park.score.accept(70)
+// reduce
+//let source = Observable.of(1,2,3)
 
+//source.reduce(1000, accumulator: -)
+//    .subscribe(onNext: {
+//        print($0)
+//    }).disposed(by: disposeBag)
+//
+//source.reduce(0, accumulator: {
+//  summary, newValue in
+//  return summary + newValue
+//}).subscribe(onNext: {
+//  print($0)
+//}).disposed(by: disposeBag)
 
-print("----son again----")
-son.score.accept(42)
+// withLatestFrom
+//let button = PublishSubject<Void>()
+//let textField = PublishSubject<String>()
+//
+//let observable = button.withLatestFrom(textField)
+//let disposable = observable.subscribe(onNext: {
+//    print($0)
+//}).disposed(by: disposeBag)
+//
+//textField.onNext("sw")
+//textField.onNext("swif")
+//textField.onNext("swift")
+//
+//button.onNext(()) //empty function ()
+//button.onNext(())
+
+// combineLatest
+//
+//let left = PublishSubject<Int>()
+//let right = PublishSubject<Int>()
+//
+//let observable = Observable.combineLatest(left, right, resultSelector: {
+//    lastOfLeft, lastOfRight in
+//    return "\(lastOfLeft) \(lastOfRight)"
+//}).subscribe(onNext: {
+//    print($0)
+//})
+//
+//left.onNext(1)
+//left.onNext(2)
+//left.onNext(3)
+//right.onNext(4)
+//left.onNext(5)
+//right.onNext(6)
+//right.onNext(7)
+
+// merge
+//let left = PublishSubject<Int>()
+//let right = PublishSubject<Int>()
+//
+//let source = Observable.of(left.asObservable(), right.asObservable())
+//
+//let observable = source.merge()
+//
+//observable.subscribe(onNext: {
+//    print($0)
+//}).disposed(by: disposeBag)
+//
+//left.onNext(1)
+//right.onNext(3)
+//left.onNext(2)
+//right.onNext(4)
+
+//
+//let first = Observable.of(1,2,3)
+//let second = Observable.of(4,5,6)
+//
+//let observable = Observable.concat([first, second])
+//
+//observable.subscribe(onNext: {
+//    print($0)
+//}).disposed(by: disposeBag)
+
+// startWith
+//let numbers = Observable.of(2,3,4)
+//
+//let observable = numbers.startWith(1)
+//observable.subscribe(onNext: {
+//    print($0)
+//}).disposed(by: disposeBag)
+
+//
+////operator transforming - flatMapLatest
+//let disposeBag = DisposeBag()
+//
+//struct Student {
+//    var score: BehaviorRelay<Int>
+//}
+//
+//let son = Student(score: BehaviorRelay(value: 75))
+//let park = Student(score: BehaviorRelay(value: 90))
+//
+//let student = PublishSubject<Student>()
+//
+//student.asObservable()
+//    .flatMapLatest { $0.score.asObservable() }
+//    .subscribe(onNext: {
+//        print($0)
+//    }).disposed(by: disposeBag)
+//
+//print("----son----")
+//student.onNext(son)
+//son.score.accept(100)
+//
+//
+//print("----park----")
+//student.onNext(park)
+//park.score.accept(70)
+//
+//
+//print("----son again----")
+//son.score.accept(42)
 
 
 ////operator transforming - flatMap
