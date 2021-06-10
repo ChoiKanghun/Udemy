@@ -10,6 +10,12 @@
 
 <br>
 
+
+
+![UC-e9f93d96-2f28-421e-9c63-cb79e007367c](https://user-images.githubusercontent.com/41955126/121474689-60095580-c9ff-11eb-9f86-37ba42af2303.jpeg)
+
+
+
 <br>
 
 
@@ -252,7 +258,7 @@ viewController
 
 
 
-# Project 2 - MockTrello
+# Project 2 - ToDo(프로젝트명 MockTrello)
 
 
 
