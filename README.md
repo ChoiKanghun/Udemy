@@ -6,6 +6,7 @@
 
 공부한 기록을 `Learning RxSwift` 폴더에 남겨두었습니다.
 
+MVVM 패턴 또한 공부하였는데, 이 과정은 따로 [여기](https://github.com/ChoiKanghun/MVVM_Practice) Respository에 정리해두었습니다.
 
 
 <br>
